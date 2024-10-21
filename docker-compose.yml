@@ -1,4 +1,7 @@
 networks:
+    api-network:
+        external: true
+        name: "mongo-network"
 
 services:
     api:
@@ -6,6 +9,14 @@ services:
         container_name: movies-api
         ports:
             - "9000:9000"
+        environment:
+            - MONGODB_URI=mongodb://admin:secret@database:27017
+            #- REDIS_URI=redis://redis "TODO"
+            - ENABLE_WRITING_HANDLERS=false
+        networks:
+            - api-network
+        depends_on:
+            - database
 
     database:
         container_name: mongoDB
@@ -14,9 +25,9 @@ services:
             - MONGO_INITDB_ROOT_USERNAME=admin
             - MONGO_INITDB_ROOT_PASSWORD=secret
         networks:
-            - profile-network
+            - api-network
         volumes:
-            - profiledata:/data/db
+            - moviedata:/data/db
 
     mongo-express:
         container_name: express
@@ -29,6 +40,8 @@ services:
             - ME_CONFIG_MONGODB_ADMINPASSWORD=secret
             - ME_CONFIG_MONGODB_SERVER=database
         networks:
-            - profile-network
+            - api-network
         depends_on:
             - database
+volumes:
+    moviedata:
