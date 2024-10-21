@@ -11,7 +11,7 @@ services:
             - "9000:9000"
         environment:
             - MONGODB_URI=mongodb://admin:secret@database:27017
-            #- REDIS_URI=redis://redis "TODO"
+            - REDIS_URI=redis://redis:6379
             - ENABLE_WRITING_HANDLERS=false
         networks:
             - api-network
@@ -43,5 +43,12 @@ services:
             - api-network
         depends_on:
             - database
+
+    redis:
+        image: redis:alpine
+        ports:
+            - "6379:6379"
+        networks:
+            - api-network
 volumes:
     moviedata:
