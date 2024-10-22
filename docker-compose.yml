@@ -7,27 +7,47 @@ services:
     api:
         image: doconnor/movies-api:1.0
         container_name: movies-api
+        restart: always
         ports:
             - "9000:9000"
         environment:
-            - MONGODB_URI=mongodb://admin:secret@database:27017
+            - MONGODB_URI=mongodb://admin:secret@mongodb:27017
             - REDIS_URI=redis://redis:6379
             - ENABLE_WRITING_HANDLERS=false
         networks:
             - api-network
         depends_on:
-            - database
+            - mongodb
+            - redis
 
-    database:
-        container_name: mongoDB
+    mongodb:
         image: mongo:8.0-rc
+        container_name: mongodb
         environment:
             - MONGO_INITDB_ROOT_USERNAME=admin
             - MONGO_INITDB_ROOT_PASSWORD=secret
         networks:
             - api-network
         volumes:
-            - moviedata:/data/db
+            - data:/data/db
+
+    mongodb-seed:
+        image: mongo:8.0-rc
+        container_name: mongodb-seed
+        depends_on:
+            - mongodb
+        volumes:
+            - ./seeding.json:/mongodb-init
+        links:
+            - mongodb
+        command: mongoimport --host mongodb --db tmdb_movies --collection movies --authenticationDatabase admin --username admin --password secret --drop --jsonArray --file /mongodb-init/seeding.json
+
+    redis:
+        image: redis:alpine
+        ports:
+            - "6379:6379"
+        networks:
+            - api-network
 
     mongo-express:
         container_name: express
@@ -38,17 +58,10 @@ services:
         environment:
             - ME_CONFIG_MONGODB_ADMINUSERNAME=admin
             - ME_CONFIG_MONGODB_ADMINPASSWORD=secret
-            - ME_CONFIG_MONGODB_SERVER=database
+            - ME_CONFIG_MONGODB_SERVER=mongodb
         networks:
             - api-network
         depends_on:
-            - database
-
-    redis:
-        image: redis:alpine
-        ports:
-            - "6379:6379"
-        networks:
-            - api-network
+            - mongodb
 volumes:
-    moviedata:
+    data:
