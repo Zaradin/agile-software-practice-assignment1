@@ -36,6 +36,8 @@ services:
         container_name: mongodb-seed
         depends_on:
             - mongodb
+        networks:
+            - api-network
         volumes:
             - ./seeding.json:/mongodb-init
         links:
