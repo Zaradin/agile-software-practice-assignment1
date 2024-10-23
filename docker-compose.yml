@@ -1,7 +1,10 @@
 networks:
   api-network:
-    external: true
-    name: "mongo-network"
+    name: api-network #api,mongo
+  mongo-network:
+    name: mongo-network #mongo, express
+  redis-network:
+    name: redis-network #redis, api
 
 services:
   api:
@@ -17,6 +20,7 @@ services:
       - ENABLE_WRITING_HANDLERS=false
     networks:
       - api-network
+      - redis-network
     depends_on:
       - mongodb
       - redis
@@ -28,6 +32,7 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
     networks:
+      - mongo-network
       - api-network
     volumes:
       - data:/data/db
@@ -40,7 +45,7 @@ services:
     profiles:
       - dev
     networks:
-      - api-network
+      - mongo-network
     volumes:
       - ./seeding.json:/mongodb-init/seeding.json
     links:
@@ -52,7 +57,7 @@ services:
     ports:
       - "6379:6379"
     networks:
-      - api-network
+      - redis-network
 
   mongo-express:
     container_name: express
@@ -65,7 +70,7 @@ services:
       - ME_CONFIG_MONGODB_ADMINPASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
       - ME_CONFIG_MONGODB_SERVER=mongodb
     networks:
-      - api-network
+      - mongo-network
     depends_on:
       - mongodb
     profiles:
