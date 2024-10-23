@@ -37,6 +37,8 @@ services:
     container_name: mongodb-seed
     depends_on:
       - mongodb
+    profiles:
+      - dev
     networks:
       - api-network
     volumes:
@@ -66,5 +68,8 @@ services:
       - api-network
     depends_on:
       - mongodb
+    profiles:
+      - dev
+
 volumes:
   data:
