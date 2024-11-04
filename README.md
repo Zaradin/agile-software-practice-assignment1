@@ -1,20 +1,20 @@
-# Agile Software Practice - Assignment 1.
+## Docker Assignment - Agile Software Practice.
 
-## Previous labs
+**Name:** Josh Crotty
 
-The first part was looking back at the previous labs where the mongo and express containers were used and incorperate them into this projects compose file.
+**Demo:** https://youtu.be/aRqfYViOsUQ
 
-## Adding the redis image
+This repository contains the containerization of the multi-container application illustrated below.
 
-The next part I focused on adding the redis image. The redis server is used to cache responses from the API and rate-limit requests to it. It was important to get this redis working before going any further because the api relies on it.
+![](./images/arch.png)
 
-## Adding a seeding container
+### Database Seeding.
 
 When the movie-api was running I logged into it using the `docker exec -it movie-api /bin/sh` command. Poking around and looking at files I found a `docker-compose.yml` file which included some docker commands and starter code for mongodb seeding. Using this got me started in setting up seeding.
 
 Also creating another container for seeding was important to get the development and production profiles working. This made it easier for running the `docker-compose.yml` file for the different environments (dev, prod).
 
-## Docker profiles
+### M.ulti-Stack.
 
 Using the docker profiles feature made it trvial to set up dynamic docker container execution. adding the `- profile dev` to mongo express and the mongo seeding containers ensured that those containers only ran when the `--profile dev` argument was passed when running the docker compose file.
 
